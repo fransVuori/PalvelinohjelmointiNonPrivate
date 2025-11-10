@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "license": "ISC",
-  "author": "Frans-Emil Vuori",
+  "author": "Frans-Emil Vuori & Markus Koski & Miika Musta",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {

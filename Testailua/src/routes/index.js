@@ -7,6 +7,8 @@ const searchRoutes = require('./searchRoutes');
 const filterRoutes = require('./filterRoutes');
 const statsRoutes = require('./statsRoutes');
 const menuRoutes = require('./menuRoutes');
+const languagesRoutes = require('./languagesRoutes');
+
 
 router.use('/categories', categoryRoutes);
 router.use('/products', productRoutes);
@@ -15,5 +17,6 @@ router.use('/search', searchRoutes);
 router.use('/filter', filterRoutes);
 router.use('/stats', statsRoutes);
 router.use('/menu', menuRoutes);
+router.use('/languages', languagesRoutes);
 
 module.exports = router;

@@ -1,0 +1,819 @@
+@font-face { 
+   /* Mukautettu fontti projektille */
+   font-family: 'Linux Biolinum'; 
+   src: url('./assets/fonts/linux_biolinum/LinBiolinum_R.ttf') format('truetype'); 
+   font-weight: normal; 
+   font-style: normal; 
+}
+
+/* Poistaa iOS/Android sinisen valintaboxin ja estää teksti-valinnan yleisiltä elementeiltä.
+  Täällä rajoitettu joukko elementtejä — älä laita kaikkeen bodyyn, jos haluat valittavuutta. */
+button,
+a,
+li,
+div,
+span {
+  -webkit-tap-highlight-color: transparent; /* Chrome, Safari, iOS */
+  -webkit-user-select: none; /* Estää tekstin valinnan klikatessa */
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none; /* Poistaa fokusrajan (muista lisätä visuaalinen fokus tarvittaessa saavutettavuuteen) */
+}
+
+/* Vältetään muuttaminen :active-tilassa usein käytetyiltä elementeiltä */
+button:active,
+a:active,
+li:active {
+  background-color: transparent;
+}
+
+/* Perusbody-tyylit: keskitetään sisältö ja asetetaan tausta/fontti */
+body { 
+   margin: 0; 
+   background-color: #111; 
+   font-family: 'Linux Biolinum', serif, Arial, sans-serif; 
+   height: 100vh; 
+   display: flex; 
+   justify-content: center; 
+   align-items: center; 
+}
+
+button:focus {
+  outline: none; /* Huom: saavutettavuus — parempi korostus kannattaa lisätä JS/CSS:llä */
+}
+
+/* Pääkontaineri joka keskittää tekstin ja hallitsee korkeuden */
+.container { 
+   text-align: center; 
+   color: white; 
+   width: 100%; 
+   height: 100vh; 
+}
+
+/* Alaotsikko — responsiivinen fonttikoko vw:llä */
+.subtitle { 
+   font-size: 3vw; 
+   font-family: 'Linux Biolinum', serif; 
+   margin-bottom: 10vh; 
+   color: #ddd; 
+}
+
+/* Lippujen näyttö — rivissä, keskitetty ja väleillä */
+.flags { 
+   display: flex; 
+   justify-content: center; 
+   gap: 7vw; 
+}
+
+.flags button { 
+   /* Nappien tyylit, isot responsiiviset kokoarvot vw:ssä */
+   background: none; 
+   border: none; 
+   padding: 0; 
+   margin: 0; 
+   cursor: pointer; 
+   outline: none; 
+   display: inline-block; 
+   width: 15vw; 
+   height: 10vw; 
+   -webkit-tap-highlight-color: transparent; 
+   transition: transform 0.2s; 
+}
+
+.flags button:hover { 
+   transform: scale(1.1); /* Kevyt hover-efekti */
+}
+
+.flags img { 
+   width: 100%; 
+   height: 100%; 
+   object-fit: cover; 
+   border-radius: 1vw; 
+   display: block; 
+}
+
+/* Esimerkkikuvien tai suuremman kuvan tyyli */
+.JP_img { 
+   width: 50vw; 
+   margin-top: 15vh; 
+   margin-bottom: 2vh; 
+}
+
+/* --- PÄÄASIAINEN LAYOUT: MENU VIEW --- */
+/* Koko näkymän jako vasempaan (lista) ja oikeaan (lisätiedot) */
+.menu-view { 
+   display: flex;
+   width: 100vw; 
+   height: 100vh;
+}
+
+/* --- VASEN PANEELI (listat, kategoriat) --- */
+.menu-left {
+  width: 66%;
+  height: 100vh;
+  border-right: 0.3vw solid #222;
+  overflow: hidden; /* estää overlayin valumisen */
+  display: flex;
+  flex-direction: column;
+  background-color: #111;
+}
+
+/* Piilotetaan WebKit-selainten scroll-palkki (koskee tätä elementtiä) */
+.menu-left::-webkit-scrollbar { 
+   display: none; 
+}
+
+/* --- YLÄPALKIN TYYLIT --- */
+.menu-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4vh 3vw;
+  border-bottom: 0.3vw solid #222;
+  background-color: #111;
+  z-index: 10;
+  position: relative;
+  transition: all 0.4s ease-in-out;
+}
+
+/* --- FILTER / OVERLAY PANEELI --- */
+/* Käytetään animaatioita max-height:llä ja opacityllä sulkemiseen/avaamiseen */
+.menu-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #111;
+  border-bottom: 0.3vw solid #222;
+  z-index: 5;
+  transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out;
+  overflow: hidden;
+  max-height: 100vh;
+  opacity: 1;
+}
+
+.menu-overlay.active {
+  max-height: 100vh; /* aktivoitu tila (esim. näkyvä) */
+  opacity: 1;
+}
+
+/* --- SUODATINNAPPIEN TYYLIT --- */
+/* Yleinen nappityyli, hoverit ja aktiivitilat */
+.filter-button { 
+  min-width: 10vw;
+  font-family: 'Linux Biolinum', serif; 
+  display: flex; 
+  align-items: center; 
+  gap: 1vw; 
+  background: none; 
+  color: #ffffff; 
+  font-size: 1.2vw; 
+  cursor: pointer; 
+  padding: 1vh 1.5vw; 
+  border: 0.2vw solid #444; 
+  border-radius: 0.5vw; 
+  -webkit-tap-highlight-color: transparent; 
+}
+
+.filter-button:hover { 
+  background-color: #222; 
+}
+
+.filter-button:active { 
+   background-color: #333; 
+   outline: none; 
+}
+
+/* Erillinen tila kun filter on aktiivinen/saved */
+.filter-button.filter-active {
+  background-color: #2ecc71; /* vihreä tallennettu-tila */
+  border-color: #27ae60;
+  color: #fff;
+}
+
+.filter-button.filter-active:hover {
+  background-color: #27ae60;
+}
+
+/* Ikoni oikeaan mittaan */
+.filter-icon { 
+   width: 1.5vw; 
+   height: auto; 
+}
+
+/* Kontrollerit oikeassa yläkulmassa */
+.filter-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1vw;
+}
+
+/* Save-tilan tyylit (sama vihreä) */
+.filter-button.save-active {
+  background-color: #2ecc71; /* vihreä */
+  border-color: #27ae60;
+  color: #fff;
+}
+.filter-button.save-active:hover {
+  background-color: #27ae60;
+}
+
+/* Reset ja cancel napit — erottuvat väreillä */
+.reset-button {
+  font-family: 'Linux Biolinum', serif;
+  background-color: #8f898800;
+  border: 0.2vw solid #8f8988;
+  color: #fff;
+  font-size: 1.2vw;
+  padding: 1vh 1.5vw;
+  border-radius: 0.5vw;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.cancel-button {
+  font-family: 'Linux Biolinum', serif;
+  background-color: #c0392b;
+  border: 0.2vw solid #a93226;
+  color: #fff;
+  font-size: 1.2vw;
+  padding: 1vh 1.5vw;
+  border-radius: 0.5vw;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.cancel-button:hover {
+  background-color: #e74c3c;
+  transform: scale(1.05);
+}
+
+/* --- OIKEA PANEELI: lisätiedot, koko ja typografia --- */
+.menu-right { 
+   width: 34%; 
+   min-width: 34%; 
+   max-width: 34%; 
+   padding: 4vh 3vw; 
+   text-align: left; 
+   position: relative; 
+   box-sizing: border-box;
+}
+
+.menu-right h3 { 
+   margin-top: 0; 
+   font-family: 'Linux Biolinum', serif; 
+   font-size: 2.5vw; 
+   color: #ddd; 
+}
+
+.menu-right p { 
+   font-size: 1.5vw; 
+   color: #ccc; 
+}
+
+/* --- KATEGORIAKENTTÄ / ITEM BOX --- */
+.category-box { 
+   display: flex; 
+   justify-content: space-between; 
+   align-items: center; 
+   padding: 12px; 
+   border: 1px solid #444; 
+   background-color: #1d1d1d; 
+   color: #ddd; 
+   margin: 10px 0; 
+   cursor: pointer; 
+   border-radius: 8px; 
+   transition: background-color 0.2s ease-in-out; 
+}
+
+.category-box.active { 
+   background-color: #353535; 
+   box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); 
+}
+
+/* Pieni ikoni/toggle animaatio */
+.toggle-icon { 
+   color: #fff; 
+   width: 1.5em; 
+   height: 1.5em; 
+   transition: transform 0.3s; 
+}
+
+/* Pyöreät kategoriakuvat ja hover/aktiiviefektit */
+.category-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: grayscale(0%);
+  transition: filter 0.3s, transform 0.2s;
+}
+
+.category-img.active {
+  filter: grayscale(100%); /* aktiivisessa harmaaksi */
+}
+
+.category-text {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.85rem;
+  color: #333;
+  word-break: break-word;
+}
+
+.category-box:hover .toggle-icon { 
+   transform: scale(1.1); 
+}
+
+/* --- TUOTEBOXIT --- */
+.product-box { 
+   border-top: 1px solid #444; 
+   padding-top: 2vh; 
+   padding-bottom: 2vh; 
+   cursor: pointer;
+}
+
+.product-box:first-child {
+   border-top: none; 
+}
+
+.product-info { display: flex; align-items: center; }
+.product-name { font-weight: bold; }
+.product-details { color: #ddd; font-size: 0.95em; }
+.product-price { font-size: 1.2em; color: #aaa; }
+.product-description { font-size: 0.9em; color: #bbb; }
+
+/* --- LISTAN KÄYTÖN SÄÄNNÖT JA ANIMAATIOT --- */
+.menu-list {
+  flex-grow: 1;
+  margin: 0; 
+  list-style-type: none;
+  padding-left: 3vw;
+  padding-right: 3vw;
+  overflow-y: auto;
+  transition: opacity 0.3s ease-in-out, transform 0.5s ease-in-out;
+}
+
+/* Yleistettyjä animation-luokkia piilottamiseen/näyttämiseen */
+.menu-list, .dietCategories {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.hidden-fade {
+  opacity: 0;
+  transform: translateY(20px); /* alaspäin liukuminen piilotettaessa */
+  pointer-events: none;
+}
+
+.visible-fade {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Erillinen hidden-tila listalle (voi olla käytössä JS:ssä) */
+.menu-list.hidden {
+  opacity: 0;
+  transform: translateY(30px);
+  pointer-events: none;
+}
+
+/* Sisäiset listaelementit: välimarginaalit ja rajat */
+.menu-list li ul li {
+   list-style-type: none; 
+   border-top: 1px solid #444; 
+   padding-top: 10px;
+   padding-bottom: 10px;
+}
+
+.menu-list li ul {
+  margin: 0;
+  padding-left: 5vh;
+  padding-right: 5vh;
+}
+
+.menu-list li ul li:first-child {
+   border-top: none; 
+}
+
+/* --- HEADER LEFT (valittu lippu) --- */
+.menu-header-left { display: flex; align-items: center; }
+
+.selected-flag { 
+   width: 6vw; 
+   height: 4vw; 
+   border-radius: 0.5vw; 
+   cursor: pointer; 
+}
+
+/* --- YLEINEN NAPPITILA AKTIIVISESSA PAINAMISESSA --- */
+button:active { 
+   background-color: rgba(0, 0, 255, 0.1); 
+}
+
+/* --- DIET CATEGORIES (pallot) --- */
+/* Responsiivinen rivi, wrap ja scrollaus vain pystysuunnassa */
+.dietCategories {
+  margin: 0; 
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2vw;
+  max-width: 100%;
+  flex-grow: 1;           /* vie jäljellä olevan korkeuden menu-leftissä */
+  overflow-y: auto;       /* pystysuuntainen scrollaus */
+  overflow-x: hidden;     /* estää vaakarullan */
+  padding-bottom: 10vh;   /* ettei alaosa jää piiloon */
+  scroll-behavior: smooth;
+}
+
+.category {
+  cursor: pointer;
+  text-align: center;
+}
+
+/* Kategoriapallot: kuvat ja tekstit alle */
+.dietCategories .category {
+  margin-top: 20px;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+}
+
+.dietCategories .category.active {
+  padding: 0;
+  background-color: transparent;
+  text-align: center;
+}
+
+.dietCategories .category img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  transition: filter 0.3s;
+}
+
+.dietCategories .category.active img {
+  filter: grayscale(100%); /* aktiivinen harmaaksi */
+}
+
+/* Scrollbar-tyylit dietCategoriesille (WebKit) */
+.dietCategories::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dietCategories::-webkit-scrollbar-thumb {
+  background-color: #2c2c2c;
+  border-radius: 1vw;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.dietCategories::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.dietCategories::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Kategorian nimet pallojen alla */
+.dietCategories .category span {
+  margin-top: 8px;
+  color: #ddd;
+  font-size: 0.9rem;
+  line-height: 1.2em;
+  text-align: center;
+}
+
+/* Hover muuttaa nimen kontrastia */
+.dietCategories .category:hover span {
+  color: #fff;
+}
+
+/* --- AINESOSA BLACKLIST -LAATIKKO --- */
+.ingredientBlacklist {
+  width: 90%;
+  margin: 5vh auto 0 auto;
+  background-color: #1b1b1b;
+  border: 1px solid #333;
+  border-radius: 1vw;
+  padding: 3vh 2vw;
+  color: #ddd;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+.ingredientBlacklist h3 {
+  font-family: 'Linux Biolinum', serif;
+  font-size: 2vw;
+  margin-bottom: 1vh;
+  color: #fff;
+}
+
+.dev-note {
+  font-size: 1.3vw;
+  color: #aaa;
+  margin-bottom: 2vh;
+  font-style: italic;
+}
+
+/* Input-rivi ja napit black listille */
+.blacklist-input-row {
+  display: flex;
+  gap: 1vw;
+  margin-bottom: 2vh;
+}
+
+.blacklist-input {
+  flex: 1;
+  padding: 0.8vh 1vw;
+  border-radius: 0.5vw;
+  border: 1px solid #444;
+  background-color: #222;
+  color: #fff;
+  font-size: 1vw;
+}
+
+.blacklist-add {
+  background-color: #444;
+  border: 1px solid #555;
+  border-radius: 0.5vw;
+  color: #fff;
+  padding: 0.8vh 1.2vw;
+  cursor: pointer;
+  font-family: 'Linux Biolinum', serif;
+  transition: background-color 0.2s;
+}
+
+.blacklist-add:hover { background-color: #666; }
+
+.blacklist-table { overflow-x: auto; }
+.blacklist-table table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.blacklist-table th,
+.blacklist-table td {
+  padding: 0.8vh 1vw;
+  border-bottom: 1px solid #333;
+}
+.blacklist-table th {
+  color: #aaa;
+  font-weight: normal;
+  font-size: 0.9vw;
+}
+.blacklist-table td {
+  font-size: 1vw;
+  color: #ddd;
+}
+
+/* --- RAINBOW GLOW NAPILLE --- */
+/* Erikoisehoste: pseudo-elementit luovat bluratun sateenkaaren */
+.filter-button.glow-on-hover {
+   position: relative;
+   z-index: 0;
+   background: #111;
+   color: #fff;
+   border-radius: 0.5vw;
+   border: 0.2vw solid #444;
+   transition: color .15s ease-in-out;
+}
+
+/* pseudo-element creates the rainbow blurred glow */
+.filter-button.glow-on-hover::before {
+   content: '';
+   position: absolute;
+   top: -2px;
+   left: -2px;
+   width: calc(100% + 4px);
+   height: calc(100% + 4px);
+   z-index: -1;
+   border-radius: inherit;
+   filter: blur(6px);
+   background: linear-gradient(45deg,
+    #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+   background-size: 400%;
+   opacity: 0;
+   transition: opacity .25s ease-in-out;
+   animation: glowing 20s linear infinite;
+}
+
+/* Säilytetään napin sisäinen tausta luettavuuden vuoksi */
+.filter-button.glow-on-hover::after {
+   content: '';
+   position: absolute;
+   left: 0;
+   top: 0;
+   width: 100%;
+   height: 100%;
+   background: #111;
+   border-radius: inherit;
+   z-index: -1;
+}
+
+/* Näytetään hohto hoverillä ja myös oletustilassa (jos halutaan näkyä) */
+.filter-button.glow-on-hover:hover::before,
+.filter-button.glow-on-hover::before {
+   opacity: 1;
+}
+
+/* Aktiivinen tila säilyttää kontrastin */
+.filter-button.glow-on-hover:active {
+   color: #fff;
+}
+
+/* Jos haluat sateenkaaren korvaavan save-active-värin, muokkaa save-active-tyyliä */
+.filter-button.save-active {
+  background-color: transparent;
+  border-color: #444;
+}
+
+.glow-on-hover:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Liikkuva gradient-efekti */
+@keyframes glowing {
+   0% { background-position: 0 0; }
+   50% { background-position: 400% 0; }
+   100% { background-position: 0 0; }
+}
+
+/* --- VALITUN LIPPUKOMPONENTIN KUVAKKEET --- */
+.selected-flag-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Pieni nuoli/kolmio vasemmalle lipun viereen (esim. valintaindikaattori) */
+.selected-flag-wrapper::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  border-right: 20px solid #333; /* Kolmion väri */
+  margin-right: 15px; /* Etäisyys lipusta */
+}
+
+/* --- PERUUTA/VAHVISTA MODAALI --- */
+/* Tausta joka estää klikkaukset ja himmentää taustan */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  pointer-events: all;
+}
+
+/* Modalin kortti: keskitetty, rajaus, skaalautuvuus */
+.confirm-modal {
+  background: #1b1b1b;
+  border: 1px solid #333;
+  border-radius: 1vw;
+  padding: 3vh 3vw;
+  max-width: 36vw;
+  width: 92%;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.6);
+  text-align: center;
+}
+
+.confirm-modal h3 {
+  margin: 0 0 1.2vh 0;
+  font-family: 'Linux Biolinum', serif;
+  color: #eee;
+  font-size: 2vw;
+}
+
+.confirm-modal p {
+  color: #ccc;
+  font-size: 1.2vw;
+  margin-bottom: 2.5vh;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 1vw;
+  justify-content: center;
+}
+
+.confirm-button {
+  font-family: 'Linux Biolinum', serif;
+  background-color: #444;
+  border: 0.2vw solid #555;
+  color: #fff;
+  font-size: 1.2vw;
+  padding: 1vh 1.8vw;
+  border-radius: 0.6vw;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+.confirm-button:hover { background-color: #555; transform: translateY(-1px); }
+.confirm-button:active { transform: translateY(0); }
+
+.confirm-button.danger {
+  background-color: #c0392b;
+  border-color: #a93226;
+}
+.confirm-button.danger:hover { background-color: #e74c3c; }
+
+/* Kun modali auki, muut elementit eivät vastaanota klikkejä */
+.menu-view.modal-open {
+  pointer-events: none;  /* disabloi koko näkymän... */
+}
+.menu-view.modal-open .modal-backdrop,
+.menu-view.modal-open .confirm-modal,
+.menu-view.modal-open .confirm-button {
+  pointer-events: auto;  /* ...paitsi modali */
+}
+
+/* --- STARTSCREEN (aloitusikkuna) --- */
+.startscreen {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(80vw 80vh at 50% 10%, rgba(255,255,255,0.06), rgba(0,0,0,0.75));
+  z-index: 999;
+}
+
+.startscreen-card {
+  background: #1b1b1b;
+  border: 1px solid #333;
+  border-radius: 1.2rem;
+  padding: clamp(16px, 3.5vh, 32px) clamp(16px, 3.5vw, 40px);
+  width: min(720px, 92vw);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  text-align: center;
+}
+
+.startscreen-card h1 {
+  margin: 0 0 0.5rem 0;
+  color: #f1f1f1;
+  font-size: clamp(20px, 3.2vw, 36px);
+}
+
+.startscreen-card .muted {
+  color: #bdbdbd;
+  font-size: clamp(12px, 2vw, 16px);
+  margin-bottom: 1.25rem;
+}
+
+.site-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 12px 0 18px;
+}
+
+.site-button {
+  background: #242424;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 16px;
+  color: #f2f2f2;
+  cursor: pointer;
+  transition: transform 0.08s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+.site-button:hover { transform: translateY(-1px); border-color: #5a5a5a; }
+.site-button:active { transform: translateY(0); }
+.site-button.selected { background: #2f2f2f; border-color: #7a7a7a; }
+
+.startscreen-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Hyödynnä jo olemassa olevaa .confirm-button-tyyliä modaalista */
+
+/* Dev build -badge vasen alakulma: ei klikattavissa */
+.dev-badge {
+  position: fixed;
+  left: 12px;
+  bottom: 10px;
+  font-size: 3vw;
+  letter-spacing: 0.02em;
+  color: #ddd;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  padding: 6px 8px;
+  user-select: none;
+  pointer-events: none;
+}

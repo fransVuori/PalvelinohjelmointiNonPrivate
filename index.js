@@ -8,22 +8,34 @@ app.use(cors());
 app.use(express.json());
 
 // --- LADATAAN TIETOKANNAT ---
-const categoriesDb = new Database(path.join(__dirname, "db-tiedostot/Categories.db"));
-const categoryItemsDb = new Database(path.join(__dirname, "db-tiedostot/CategoryItems.db"));
-const productsDb = new Database(path.join(__dirname, "db-tiedostot/Products.db"));
+const categoriesDb = new Database(path.join(__dirname, "db-tiedostot", "Categories.db"));
+const categoryItemsDb = new Database(path.join(__dirname, "db-tiedostot", "CategoryItems.db"));
+
+// Tuotteet kieliversioina
+const products = {
+  fi: new Database(path.join(__dirname, "db-tiedostot", "ProductsFI.db")),
+  sv: new Database(path.join(__dirname, "db-tiedostot", "ProductsSV.db")),
+  en: new Database(path.join(__dirname, "db-tiedostot", "ProductsEN.db")),
+};
+
+// Apufunktio: valitse oikea kielitietokanta
+function getProductDb(lang) {
+  const l = (lang || "fi").toLowerCase();
+  if (products[l]) return products[l];
+  return products.fi; // fallback FI
+}
 
 
 // --- TESTI ---
 app.get("/api/test", (req, res) => {
-  res.json({ message: "SQLite backend toimii!" });
+  res.json({ message: "SQLite backend (FI/SV/EN) toimii!" });
 });
 
 
 // --- HAE KAIKKI KATEGORIAT ---
 app.get("/api/categories", (req, res) => {
   try {
-    const stmt = categoriesDb.prepare("SELECT * FROM Categories");
-    const rows = stmt.all();
+    const rows = categoriesDb.prepare("SELECT * FROM Categories").all();
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -35,6 +47,8 @@ app.get("/api/categories", (req, res) => {
 // --- HAE TUOTTEET TIETYSTÄ KATEGORIASTA ---
 app.get("/api/category/:id", (req, res) => {
   const categoryId = req.params.id;
+  const lang = req.query.lang;
+  const productDb = getProductDb(lang);
 
   try {
     const itemIds = categoryItemsDb
@@ -42,11 +56,11 @@ app.get("/api/category/:id", (req, res) => {
       .all(categoryId)
       .map(row => row.productId);
 
-    const products = itemIds.map(id => {
-      return productsDb.prepare("SELECT * FROM Products WHERE id = ?").get(id);
-    });
+    const productsList = itemIds.map(id =>
+      productDb.prepare("SELECT * FROM Products WHERE id = ?").get(id)
+    );
 
-    res.json(products.filter(Boolean)); // poistaa null-arvot
+    res.json(productsList.filter(Boolean));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Category product fetch error" });
@@ -56,9 +70,11 @@ app.get("/api/category/:id", (req, res) => {
 
 // --- HAE YKSI TUOTE ---
 app.get("/api/product/:id", (req, res) => {
+  const lang = req.query.lang;
+  const productDb = getProductDb(lang);
+
   try {
-    const stmt = productsDb.prepare("SELECT * FROM Products WHERE id = ?");
-    const product = stmt.get(req.params.id);
+    const product = productDb.prepare("SELECT * FROM Products WHERE id = ?").get(req.params.id);
 
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
@@ -74,9 +90,11 @@ app.get("/api/product/:id", (req, res) => {
 
 // --- HAE KAIKKI TUOTTEET ---
 app.get("/api/products", (req, res) => {
+  const lang = req.query.lang;
+  const productDb = getProductDb(lang);
+
   try {
-    const stmt = productsDb.prepare("SELECT * FROM Products");
-    const rows = stmt.all();
+    const rows = productDb.prepare("SELECT * FROM Products").all();
     res.json(rows);
   } catch (err) {
     console.error(err);

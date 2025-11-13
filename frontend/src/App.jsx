@@ -6,7 +6,6 @@ import React, { useState, useEffect } from "react";
 import { translations } from "./i18n";
 import Items from "./Items";
 import ShowMenu from "./frames/ShowMenu";
-import StartScreen from "./frames/StartScreen";
 import StartMenu from "./frames/StartMenu";
 
 function App() {
@@ -14,7 +13,6 @@ function App() {
   const [lang, setLang] = useState("fi");            // valittu kieli
   const [showMenu, setShowMenu] = useState(false);   // näytetäänkö varsinainen menu
   const [menuItems, setMenuItems] = useState([]);    // haetut ruokalistatiedot
-  const [showStartScreen, setShowStartScreen] = useState(true); // käynnistysnäkymä
 
   // Kun komponentti latautuu ensimmäisen kerran, haetaan menu-data
   useEffect(() => {
@@ -25,19 +23,16 @@ function App() {
 
   // Käyttäjä valitsee lipusta kielen
   const handleFlagClick = (language) => {
-    setLang(language);     // päivitetään valittu kieli
-    setShowMenu(true);     // siirrytään menu-näkymään
+    setLang(language);
+    setShowMenu(true);
   };
 
   // Sovelluksen näkymärakenne:
-  // 1. Näytetään ensin käynnistysruutu (StartScreen)
-  // 2. Kun käyttäjä jatkaa, näytetään kielivalinta (StartMenu)
-  // 3. Kun kieli on valittu, näytetään varsinainen menu (ShowMenu)
+  // 1. Ensin kielivalinta (StartMenu)
+  // 2. Sitten varsinainen menu (ShowMenu)
   return (
     <div className="container">
-      {showStartScreen ? (
-        <StartScreen onContinue={() => setShowStartScreen(false)} />
-      ) : !showMenu ? (
+      {!showMenu ? (
         <StartMenu handleFlagClick={handleFlagClick} />
       ) : (
         <ShowMenu

@@ -1,0 +1,3 @@
+Categories.db: Sisältää kaikki valikon kategoriat ja niihin liittyvät tuote-ID:t.
+Products.db: Sisältää kaikki 43 tuotetta kolmella eri kielellä.
+CategoryItems.db: Yhdistää nämä kaksi taulua, jotta suhteet ovat selkeät ja kyselyt tehokkaita.

@@ -2,6 +2,8 @@
 import React, { useState, useRef } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import TypewriterText from "../TypewriterText";
+import Items from "../Items";
+
 
 // Liput ja kuvat eri käyttöliittymäelementeille
 import finFlag from "../assets/img/fi.png";
@@ -117,6 +119,7 @@ const ShowMenu = ({ lang, setShowMenu, menuItems, translations }) => {
   const [fadeOut, setFadeOut] = useState(false); // fade-animaatio
   const [showCancelConfirm, setShowCancelConfirm] = useState(false); // peruuta-modal
   const [showResetConfirm, setShowResetConfirm] = useState(false); // nollaus-modal
+  const [filteredProducts, setFilteredProducts] = useState([]); // suodatetut tuotteet
 
   // Modalien hallintafunktiot
   const handleCancelClick = () => {
@@ -174,19 +177,30 @@ const ShowMenu = ({ lang, setShowMenu, menuItems, translations }) => {
     }
   };
 
-  // Tallentaa suodatinmuutokset
-  const saveChanges = () => {
+  const saveChanges = async () => {
     setActiveCategory(tempCategoryState);
     setHasChanges(false);
+
+    try {
+      const products = await Items.getFilteredProducts(lang, tempCategoryState);
+      setFilteredProducts(products);
+    } catch (err) {
+      console.error("Filter fetch failed:", err);
+    }
+
     toggleFilter();
   };
+
+
 
   // Peru suodatinmuutokset ja palaa alkuun
   const cancelChanges = () => {
     setTempCategoryState(activeCategory);
     setHasChanges(false);
+    setFilteredProducts([]); 
     toggleFilter();
   };
+
 
   // Klikattaessa dieettikategoriaa (pallo)
   const handleCategoryClick = (categoryId) => {
@@ -199,20 +213,7 @@ const ShowMenu = ({ lang, setShowMenu, menuItems, translations }) => {
   };
 
   // Suodatettu lista tuotteista aktiivisten kategorioiden perusteella
-  const filteredProducts = menuItems
-    .flatMap((category) => category.items || [])
-    .filter((product) => {
-      if (!Object.values(activeCategory).some(Boolean)) return true;
-
-      return Object.keys(activeCategory).every((key) => {
-        if (!activeCategory[key]) return true;
-        // käänteinen logiikka (esim. lihaton → tuote ei saa olla lihallinen)
-        return !product[key];
-      });
-    })
-    // Lajittelu valitun kielen mukaan
-    .sort((a, b) => getLocalizedText(a, lang, "name").localeCompare(getLocalizedText(b, lang, "name")));
-
+  // (filteredProducts is managed via state and updated by setFilteredProducts)
   // Dieettikategorioiden data
   const categoryData = [
     { id: "gluten", labelKey: "gluten", altLabelKey: "glutenAlt", img: glutenImg },
@@ -332,6 +333,7 @@ const ShowMenu = ({ lang, setShowMenu, menuItems, translations }) => {
                       {openCategory === category.id ? <ChevronUp /> : <ChevronDown />}
                     </span>
                   </div>
+
                   <div ref={(el) => { categoryRefs.current[category.id] = el; }}>
                     {openCategory === category.id && category.items?.length > 0 && (
                       <ul>
@@ -343,11 +345,15 @@ const ShowMenu = ({ lang, setShowMenu, menuItems, translations }) => {
                             style={{ cursor: "pointer" }}
                           >
                             <div className="product-info">
-                              <span className="product-name">{getLocalizedText(product, lang, "name")}</span>
+                              <span className="product-name">
+                                {getLocalizedText(product, lang, "name")}
+                              </span>
                               <span className="product-details">{product.details}</span>
                               <span className="product-price">{product.price}</span>
                             </div>
-                            <p className="product-description">{getLocalizedText(product, lang, "description")}</p>
+                            <p className="product-description">
+                              {getLocalizedText(product, lang, "description")}
+                            </p>
                           </li>
                         ))}
                       </ul>

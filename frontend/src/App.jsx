@@ -14,12 +14,28 @@ function App() {
   const [showMenu, setShowMenu] = useState(false);   // näytetäänkö varsinainen menu
   const [menuItems, setMenuItems] = useState([]);    // haetut ruokalistatiedot
 
-  // Kun komponentti latautuu ensimmäisen kerran, haetaan menu-data
+  // Haetaan oikean kielinen tietokanta kun kieli muuttuu
   useEffect(() => {
-    Items.getAll()
-      .then((data) => setMenuItems(data))
-      .catch((err) => console.error("Error fetching menu items:", err));
-  }, []);
+    async function loadData() {
+      try {
+        const categories = await Items.getCategories();
+
+        const menuData = await Promise.all(
+          categories.map(async (cat) => {
+            const items = await Items.getCategoryItems(cat.id, lang);
+            return { ...cat, items };
+          })
+        );
+
+        setMenuItems(menuData);
+      } catch (err) {
+        console.error("DB fetch error:", err);
+      }
+    }
+
+    loadData();
+  }, [lang]);
+
 
   // Käyttäjä valitsee lipusta kielen
   const handleFlagClick = (language) => {

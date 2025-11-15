@@ -88,14 +88,34 @@ app.get("/api/product/:id", (req, res) => {
 });
 
 
-// --- HAE KAIKKI TUOTTEET ---
+// --- HAE KAIKKI TUOTTEET JA SUODATA TARVITTAESSA ---
 app.get("/api/products", (req, res) => {
   const lang = req.query.lang;
   const productDb = getProductDb(lang);
 
   try {
-    const rows = productDb.prepare("SELECT * FROM Products").all();
+    let rows = productDb.prepare("SELECT * FROM Products").all();
+
+    // Poista lang-parametri, loput ovat filttereitä
+    const filters = { ...req.query };
+    delete filters.lang;
+
+    // Suodata backendissä
+    Object.entries(filters).forEach(([key, value]) => {
+      const boolValue = value === "true";
+
+      rows = rows.filter(product => {
+        // boolValue true  -> EI SAA sisältää allergiaa/meat/gluten  -> product[key] pitää olla 0
+        // boolValue false -> älä käytä tätä filteriä
+        if (boolValue === true) {
+          return product[key] === 0; 
+        }
+        return true;
+      });
+    });
+
     res.json(rows);
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Product fetch error" });

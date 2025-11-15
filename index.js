@@ -1,41 +1,132 @@
 const express = require("express");
 const cors = require("cors");
-const Database = require("better-sqlite3");
 const path = require("path");
+const { Sequelize, DataTypes } = require("sequelize");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- LADATAAN TIETOKANNAT ---
-const categoriesDb = new Database(path.join(__dirname, "db-tiedostot", "Categories.db"));
-const categoryItemsDb = new Database(path.join(__dirname, "db-tiedostot", "CategoryItems.db"));
+// --- SEQUELIZE-YHTEYDET ---
 
-// Tuotteet kieliversioina
-const products = {
-  fi: new Database(path.join(__dirname, "db-tiedostot", "ProductsFI.db")),
-  sv: new Database(path.join(__dirname, "db-tiedostot", "ProductsSV.db")),
-  en: new Database(path.join(__dirname, "db-tiedostot", "ProductsEN.db")),
-};
+// Kategoriat (Categories.db)
+const categoriesSequelize = new Sequelize({
+  dialect: "sqlite",
+  storage: path.join(__dirname, "db-tiedostot", "Categories.db"),
+  logging: false,
+});
 
-// Apufunktio: valitse oikea kielitietokanta
-function getProductDb(lang) {
-  const l = (lang || "fi").toLowerCase();
-  if (products[l]) return products[l];
-  return products.fi; // fallback FI
+const Category = categoriesSequelize.define(
+  "Category",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
+    // oletus: kielikentät, jos näitä ei ole, ei haittaa kun käytämme raw:true
+    nameFI: DataTypes.STRING,
+    nameSV: DataTypes.STRING,
+    nameEN: DataTypes.STRING,
+    name: DataTypes.STRING,
+  },
+  {
+    tableName: "Categories",
+    timestamps: false,
+  }
+);
+
+// CategoryItems (CategoryItems.db)
+const categoryItemsSequelize = new Sequelize({
+  dialect: "sqlite",
+  storage: path.join(__dirname, "db-tiedostot", "CategoryItems.db"),
+  logging: false,
+});
+
+const CategoryItem = categoryItemsSequelize.define(
+  "CategoryItem",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
+    categoryId: DataTypes.INTEGER,
+    productId: DataTypes.INTEGER,
+  },
+  {
+    tableName: "CategoryItems",
+    timestamps: false,
+  }
+);
+
+// Products FI / SV / EN (ProductsFI.db jne.)
+function createProductModel(storagePath) {
+  const sequelize = new Sequelize({
+    dialect: "sqlite",
+    storage: storagePath,
+    logging: false,
+  });
+
+  const Product = sequelize.define(
+    "Product",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+      },
+      // *** NÄMÄ OVAT OIKEAT SARAMET TAULUSSA ***
+      name: DataTypes.STRING,
+      details: DataTypes.TEXT,
+      description: DataTypes.TEXT,
+      price: DataTypes.STRING,
+
+      // dieetti / allergia-kentät (0/1)
+      gluten: DataTypes.INTEGER,
+      milk: DataTypes.INTEGER,
+      lactose: DataTypes.INTEGER,
+      nuts: DataTypes.INTEGER,
+      meat: DataTypes.INTEGER,
+      animal: DataTypes.INTEGER,
+      fish: DataTypes.INTEGER,
+      seafood: DataTypes.INTEGER,
+      soy: DataTypes.INTEGER,
+      egg: DataTypes.INTEGER,
+    },
+    {
+      tableName: "Products",
+      timestamps: false,
+    }
+  );
+
+  return { sequelize, Product };
 }
 
+const { Product: ProductFI } = createProductModel(
+  path.join(__dirname, "db-tiedostot", "ProductsFI.db")
+);
+const { Product: ProductSV } = createProductModel(
+  path.join(__dirname, "db-tiedostot", "ProductsSV.db")
+);
+const { Product: ProductEN } = createProductModel(
+  path.join(__dirname, "db-tiedostot", "ProductsEN.db")
+);
+
+// Apufunktio: valitse oikea Product-malli kielen mukaan
+function getProductModel(lang) {
+  const l = (lang || "fi").toLowerCase();
+  if (l === "sv") return ProductSV;
+  if (l === "en") return ProductEN;
+  return ProductFI;
+}
 
 // --- TESTI ---
 app.get("/api/test", (req, res) => {
-  res.json({ message: "SQLite backend (FI/SV/EN) toimii!" });
+  res.json({ message: "SQLite backend (FI/SV/EN) Sequelize-versio toimii!" });
 });
 
-
 // --- HAE KAIKKI KATEGORIAT ---
-app.get("/api/categories", (req, res) => {
+app.get("/api/categories", async (req, res) => {
   try {
-    const rows = categoriesDb.prepare("SELECT * FROM Categories").all();
+    const rows = await Category.findAll({ raw: true });
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -43,38 +134,43 @@ app.get("/api/categories", (req, res) => {
   }
 });
 
-
 // --- HAE TUOTTEET TIETYSTÄ KATEGORIASTA ---
-app.get("/api/category/:id", (req, res) => {
+app.get("/api/category/:id", async (req, res) => {
   const categoryId = req.params.id;
   const lang = req.query.lang;
-  const productDb = getProductDb(lang);
+  const Product = getProductModel(lang);
 
   try {
-    const itemIds = categoryItemsDb
-      .prepare("SELECT productId FROM CategoryItems WHERE categoryId = ?")
-      .all(categoryId)
-      .map(row => row.productId);
+    // hae tähän kategoriaan kuuluvat productId:t CategoryItems-taulusta
+    const itemRows = await CategoryItem.findAll({
+      where: { categoryId: Number(categoryId) },
+      raw: true,
+    });
 
-    const productsList = itemIds.map(id =>
-      productDb.prepare("SELECT * FROM Products WHERE id = ?").get(id)
-    );
+    const ids = itemRows.map((row) => row.productId);
+    if (ids.length === 0) {
+      return res.json([]);
+    }
 
-    res.json(productsList.filter(Boolean));
+    const productsList = await Product.findAll({
+      where: { id: ids },
+      raw: true,
+    });
+
+    res.json(productsList);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Category product fetch error" });
   }
 });
 
-
 // --- HAE YKSI TUOTE ---
-app.get("/api/product/:id", (req, res) => {
+app.get("/api/product/:id", async (req, res) => {
   const lang = req.query.lang;
-  const productDb = getProductDb(lang);
+  const Product = getProductModel(lang);
 
   try {
-    const product = productDb.prepare("SELECT * FROM Products WHERE id = ?").get(req.params.id);
+    const product = await Product.findByPk(req.params.id, { raw: true });
 
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
@@ -87,41 +183,32 @@ app.get("/api/product/:id", (req, res) => {
   }
 });
 
-
 // --- HAE KAIKKI TUOTTEET JA SUODATA TARVITTAESSA ---
-app.get("/api/products", (req, res) => {
+app.get("/api/products", async (req, res) => {
   const lang = req.query.lang;
-  const productDb = getProductDb(lang);
+  const Product = getProductModel(lang);
 
   try {
-    let rows = productDb.prepare("SELECT * FROM Products").all();
+    let rows = await Product.findAll({ raw: true });
 
     // Poista lang-parametri, loput ovat filttereitä
     const filters = { ...req.query };
     delete filters.lang;
 
-    // Suodata backendissä
+    // Suodata backendissä:
+    // UI-logiikka: filteri = true tarkoittaa "EI saa sisältää tätä" → sarakkeen arvo pitää olla 0
     Object.entries(filters).forEach(([key, value]) => {
-      const boolValue = value === "true";
-
-      rows = rows.filter(product => {
-        // boolValue true  -> EI SAA sisältää allergiaa/meat/gluten  -> product[key] pitää olla 0
-        // boolValue false -> älä käytä tätä filteriä
-        if (boolValue === true) {
-          return product[key] === 0; 
-        }
-        return true;
-      });
+      if (value === "true") {
+        rows = rows.filter((product) => product[key] === 0);
+      }
     });
 
     res.json(rows);
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Product fetch error" });
   }
 });
-
 
 // --- KÄYNNISTÄ PALVELIN ---
 const PORT = 3001;

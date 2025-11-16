@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize, DataTypes, Op } = require("sequelize");
 
 const app = express();
 app.use(cors());
@@ -23,17 +23,16 @@ const Category = categoriesSequelize.define(
       type: DataTypes.INTEGER,
       primaryKey: true,
     },
-    // oletus: kielikentät, jos näitä ei ole, ei haittaa kun käytämme raw:true
     nameFI: DataTypes.STRING,
     nameSV: DataTypes.STRING,
     nameEN: DataTypes.STRING,
-    name: DataTypes.STRING,
   },
   {
     tableName: "Categories",
     timestamps: false,
   }
 );
+
 
 // CategoryItems (CategoryItems.db)
 const categoryItemsSequelize = new Sequelize({
@@ -45,12 +44,14 @@ const categoryItemsSequelize = new Sequelize({
 const CategoryItem = categoryItemsSequelize.define(
   "CategoryItem",
   {
-    id: {
+    categoryId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
     },
-    categoryId: DataTypes.INTEGER,
-    productId: DataTypes.INTEGER,
+    productId: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
   },
   {
     tableName: "CategoryItems",
@@ -141,28 +142,33 @@ app.get("/api/category/:id", async (req, res) => {
   const Product = getProductModel(lang);
 
   try {
-    // hae tähän kategoriaan kuuluvat productId:t CategoryItems-taulusta
+    // Hae productId:t
     const itemRows = await CategoryItem.findAll({
       where: { categoryId: Number(categoryId) },
       raw: true,
     });
 
-    const ids = itemRows.map((row) => row.productId);
+    const ids = itemRows.map(row => row.productId);
+
     if (ids.length === 0) {
-      return res.json([]);
+      return res.json([]); // Ei tuotteita tässä kategoriassa
     }
 
+    // Hae tuotteet Op.in avulla
     const productsList = await Product.findAll({
-      where: { id: ids },
+      where: {
+        id: { [Op.in]: ids }
+      },
       raw: true,
     });
 
     res.json(productsList);
   } catch (err) {
-    console.error(err);
+    console.error("CATEGORY ERROR:", err);
     res.status(500).json({ error: "Category product fetch error" });
   }
 });
+
 
 // --- HAE YKSI TUOTE ---
 app.get("/api/product/:id", async (req, res) => {

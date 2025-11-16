@@ -1,0 +1,44 @@
+id,name,details,description,price,gluten,milk,lactose,nuts,meat,animal,fish,seafood,soy,egg
+1,"Parsonage Chanterelle Soup","(L, G on request)","Creamy chanterelle soup seasoned with Juustoportti Pappila cheese. Served with Malax loaf and churned butter.","15,90 €",1,1,1,0,0,1,0,0,0,0
+2,"Juustoportti Creamy Salmon Soup","(L, G on request)","Delicious salmon soup made with Juustoportti churned butter and cream. Served with Malax loaf and churned butter.","17,90 €",0,1,1,0,0,1,1,0,0,0
+3,"House Salad","(L, G)","You can choose the salad with either chicken, Halla cheese, or a vegetable patty. Fresh salad in lemon vinaigrette dressing, quick pickles and mini plum tomatoes, pomegranate seeds, blueberries, roasted seeds, and balsamic vinegar.","15,90 €",1,1,0,0,0,1,0,0,0,0
+4,"Fisherman's Salmon Salad","(M, L, G)","Fresh salad in lemon vinaigrette dressing, fried salmon, quick pickles and mini plum tomatoes, pomegranate seeds, blueberries, roasted seeds, and balsamic vinegar.","17,90 €",1,1,0,0,0,1,1,0,0,0
+5,"Vegetable Gallery","(VEG, G)","Pea and beetroot patties, country style potato wedges, roasted oven root vegetables, and green asparagus. Kale, bell pepper, zucchini, corn, marinated red onion, and Juustoportti kevi fig dip.","18,90 €",1,1,0,0,0,0,0,0,0,0
+6,"Veggie Burger with Sweet Potato Fries",(VEG),"Pea and beetroot patties, lettuce, tomato, marinated red onion, devil's jam (chili jam), sweet potato fries, and Juustoportti kevi fig dip.","17,90 €",0,0,1,0,0,0,0,0,0,0
+7,"Chili Chicken Pasta",(L),"Penne pasta in a creamy chili sauce, chicken breast, grated Grand Reserve cheese, marinated red onion, and lemon oil.","17,90 €",1,1,0,0,1,1,0,0,0,0
+8,"Hunter's Mushroom Pasta with air-dried ham",(L),"Penne pasta in a creamy chanterelle sauce, air-dried ham, red onion, and grated Grand Reserve cheese.","17,90 €",1,1,0,0,1,1,0,0,0,0
+9,"Fried Salmon with Chanterelle Sauce","(L, G)","Fried salmon, country style potato wedges, oven root vegetables, green asparagus, lime, dill, and chanterelle sauce.","24,90 €",1,1,0,0,0,1,1,0,0,0
+10,"Vendace Fried in Juustoportti Churned Butter",(L),"Rye-battered vendace, mashed potatoes, quick pickles, and garlic yogurt sauce.","19,90 €",1,1,0,0,0,1,1,0,0,0
+11,"Goat Cheese Chicken","(L, G)","Corn-battered chicken breast fillet, chef's sauce, country style potato wedges, oven root vegetables and green asparagus, Chevre cheese and cloudberry jam.","18,90 €",1,1,0,0,1,1,0,0,0,0
+12,"Bearnaise Chicken","(L, G)","Corn-battered chicken breast fillet, lime bearnaise sauce and matchstick fries, bell pepper, zucchini, kale, pomegranate seeds and blueberries.","18,90 €",1,1,0,0,1,1,0,0,0,0
+13,"Master's Grilled Beef","(L, G)","Beef sirloin steak 150 g, chef's butter and sauce, matchstick fries, kale, bell pepper, zucchini, corn on the cob, and aioli.","22,90 €",1,1,0,0,1,1,0,0,0,0
+14,"Juustoportti Pepper Steak","(L, G)","Beef sirloin steak, Juustoportti Brandy-nut cheese, bacon, country style potato wedges, oven root vegetables, green asparagus, and pepper cream sauce.","25,90 €",1,1,0,1,1,1,0,0,0,0
+15,"Minute Steak","(L, G)","Domestic beef minute steak, chef's seasoned butter, matchstick fries, roasted oven root vegetables, and green asparagus.","22,90 €",1,1,0,0,1,1,0,0,0,0
+16,Meatballs,"(L, G)","Meatballs made from domestic beef, mashed potatoes, cream sauce, quick pickles, and lingonberry jam.","17,90 €",1,1,0,0,1,1,0,0,0,0
+17,"Cheesemaster's Pork Black & White","(L, G)","Pork minute steak filled with Juustoportti Brandy-nut cheese, bearnaise and chef's sauce, matchstick fries, oven root vegetables, and green asparagus.","19,90 €",1,1,0,1,1,1,0,0,0,0
+18,"Hunter's Sandwich",(L),"Hunter's sandwich made from Levain bread and pork sirloin steak. Chanterelle stew, kale, mini plum tomatoes, marinated red onion. Served with matchstick fries.","17,90 €",1,1,0,0,1,1,0,0,0,0
+19,"Master's Grilled Beef Special","(L, G)","Beef sirloin steak with side dishes and chef's seasoned butter.","23,90 €",1,1,0,0,1,1,0,0,0,0
+20,"Meatballs and mash","(L, G)","Meatballs, mashed potatoes, cream sauce, fresh cucumber slices and mini plum tomatoes.","7,90 €",1,1,0,0,1,1,0,0,0,0
+21,"Fried Salmon","(L, G)","Fried salmon, mashed potatoes, cucumber mayonnaise, mini plum tomatoes and fresh cucumber slices.","9,90 €",1,1,0,0,0,1,1,0,0,0
+22,"Children's Minute Steak","(M, L, G)","Pork minute steak, matchstick fries, fresh cucumber, carrot, corn on the cob, and dip mayonnaise.","8,90 €",1,1,0,0,1,1,0,0,0,0
+23,"Children's Chicken Basket","(M, L, G)","Fries, breaded chicken, fresh cucumber, carrot, corn on the cob, and dip mayonnaise.","7,90 €",1,1,0,0,1,1,0,0,0,0
+24,"Children's Hamburger Meal",(L),"Hamburger patty, lettuce, cheddar cheese, hamburger and cucumber mayonnaise, country style fries, and ketchup.","7,90 €",1,1,0,0,1,1,0,0,0,0
+25,"Children's Pizza with two toppings","","Toppings: Pineapple, tomato, red onion, garlic, mushroom, bread cheese, chevre, blue cheese, ham, chicken, bacon, tuna, pepperoni salami, kebab, shrimp, cold-smoked salmon, air-dried ham, devil's salsa, arugula.","7,90 €",1,1,0,0,1,1,1,0,0,0
+26,"Bread Cheese Burger Meal",(L),"Bread cheese, devil's salsa (chili jam), lettuce, tomato, hamburger and cucumber mayonnaise.","17,90 €",1,1,0,0,1,1,0,0,0,0
+27,"House Burger Meal",(L),"Finnish whole meat beef patty, bread cheese, devil's salsa (chili jam), lettuce, tomato, hamburger and cucumber mayonnaise.","18,90 €",1,1,0,0,1,1,0,0,0,0
+28,"Premium Burger Meal",(L),"Two Finnish whole meat beef patties, lettuce, tomato, cheddar cheese, bacon, marinated red onion, breaded onion rings, and hamburger and cucumber mayonnaise.","19,90 €",1,1,0,0,1,1,0,0,0,0
+29,"BBQ Burger Meal",(L),"BBQ sauce, Finnish whole meat beef patty, cheddar cheese, lettuce, tomato, marinated red onion, and hamburger and cucumber mayonnaise.","18,90 €",1,1,0,0,1,1,0,0,0,0
+30,"Chicken Burger Meal",(L),"Corn-battered chicken breast fillet, goat cheese, lettuce, tomato, marinated red onion, breaded onion rings, and hamburger and cucumber mayonnaise.","18,90 €",1,1,0,0,1,1,0,0,0,0
+31,"Special Opera",(L),"Salami, ham, and tuna.","14,90 €",1,1,0,0,1,1,1,0,0,0
+32,Americana,(L),"Ham, pineapple, BBQ sauce, and arugula.","14,90 €",1,1,0,0,1,1,0,0,0,0
+33,"Margherita Juustoportti Style",(L),"Tomato sauce, bread cheese, grated cheese.","14,90 €",1,1,0,0,0,1,0,0,0,0
+34,"Fantasy Pizza with three toppings","","Toppings: Pineapple, tomato, red onion, garlic, mushroom, bread cheese, chevre, blue cheese, ham, chicken, bacon, tuna, pepperoni salami, kebab, shrimp, jalapeno, air-dried ham, devil's salsa, arugula.","15,90 €",1,1,0,0,1,1,1,0,0,0
+35,"Chicken Farmer's Board Pizza BBQ",(L),"Pulled chicken, semi-dried tomato, red onion, pineapple, arugula, and BBQ sauce.","15,90 €",1,1,0,0,1,1,0,0,0,0
+36,"Cheese Cellar Board Pizza",(L),"Bread cheese, bell pepper cheese, blue cheese, semi-dried tomato, arugula, and cloudberry jam.","15,90 €",1,1,0,0,0,1,0,0,0,0
+37,"Emperor's Board Pizza",(L),"Air-dried ham, bread cheese, semi-dried tomatoes, marinated red onion, and arugula.","15,90 €",1,1,0,0,1,1,0,0,0,0
+38,"Kebab Board Pizza",(L),"Kebab meat, grated cheese, semi-dried tomatoes, jalapeno, marinated red onion, kebab and garlic sauce, arugula.","15,90 €",1,1,0,0,1,1,0,0,0,0
+39,"Chicken Burrito",(L),"Crispy battered chicken, cheese and salsa sauce, grated cheese, fresh lettuce, mini plum tomatoes, jalapeno and lime-jalapeno mayonnaise. Juustoportti's Burrito can be chosen with either Nacho chips & salsa dip or Matchstick fries & Chili mayonnaise dip.","15,90 €",1,1,0,0,1,1,0,0,0,0
+40,"Vegetable Patty Burrito",(L),"Pea and beetroot patty, cheese and salsa sauce, grated cheese, fresh lettuce, mini plum tomatoes, jalapeno and lime-jalapeno mayonnaise. Juustoportti's Burrito can be chosen with either Nacho chips & salsa dip or Matchstick fries & Chili mayonnaise dip.","15,90 €",1,1,0,0,0,0,0,0,0,0
+41,Kebab,"(L, G)","Kebab meat, country style fries, fresh lettuce, mini plum tomatoes, red onion, garlic yogurt sauce, and kebab sauce.","15,90 €",1,1,0,0,1,1,0,0,0,0
+42,"Artisan Sausage Fries","(L, G)","Atria artisan sausage, chorizo, bratwurst, matchstick fries, lettuce, marinated red onion, mustard pickle salad, and Dijon mustard dip.","15,90 €",1,1,0,0,1,1,0,0,0,0
+43,"Juustoportti Burrito Combo",(L),"Choose chicken or vegetable patty filling. Includes cheese sauce, lettuce, salsa, and chili mayonnaise.","16,90 €",1,1,0,0,1,1,0,0,0,0

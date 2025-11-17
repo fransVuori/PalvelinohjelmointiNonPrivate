@@ -2,8 +2,8 @@ import axios from "axios";
 
 const baseUrl =
   import.meta.env.MODE === "development"
-    ? "http://localhost:3001/api"
-    : "https://jp-menu-backend.onrender.com/api";
+    ? "http://localhost:3001/api" // Käytössä kun ajat 'npm run dev'
+    : "/api"; // Käytössä kun 'npm run build' on tehty
 
 const getCategories = () => {
   return axios.get(`${baseUrl}/categories`).then(res => res.data);

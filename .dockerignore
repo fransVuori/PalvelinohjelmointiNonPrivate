@@ -1,0 +1,9 @@
+# Paikalliset riippuvuudet (sekä backend että frontend)
+node_modules
+frontend/node_modules
+
+# Lokit
+npm-debug.log
+
+# Viten välimuisti
+frontend/.vite

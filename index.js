@@ -7,6 +7,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Tarjoile staattiset tiedostot (React-build) "public"-kansiosta
+const buildPath = path.join(__dirname, 'public');
+app.use(express.static(buildPath));
+
+
 // --- SEQUELIZE-YHTEYDET ---
 
 // Kategoriat (Categories.db)
@@ -214,6 +219,12 @@ app.get("/api/products", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Product fetch error" });
   }
+});
+
+// "Catch-all": Jos reittiä ei tunnisteta API-reitiksi,
+// lähetä index.html, jotta React (react-router) voi ottaa hallinnan.
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(buildPath, 'index.html'));
 });
 
 // --- KÄYNNISTÄ PALVELIN ---
